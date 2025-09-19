@@ -65,29 +65,48 @@ class _HangmanScreenState extends State<HangmanScreen>
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.black87,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          title: const Text(
-            "😢 Game Over",
-            style: TextStyle(color: Colors.redAccent),
+          title: Column(
+            children: [
+              const Text(
+                "😢",
+                style: TextStyle(fontSize: 95),
+              ),
+              Text(
+                "Game Over",
+                style: AppTextStyles.headingLarge.copyWith(fontSize: 25),
+              ),
+            ],
           ),
-          content: Text(
-            "The word was: ${_game.word.toUpperCase()}",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+          content: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: "The correct word was:\n",
+                  style: AppTextStyles.bodySmall,
+                ),
+                TextSpan(
+                  text: _game.word,
+                  style: AppTextStyles.headingMedium,
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
           ),
           actions: [
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-                _resetGame();
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text("Play Again"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _resetGame();
+                  },
+                  child: const Text("PLAY AGAIN"),
+                ),
+              ],
             ),
           ],
         );
@@ -142,6 +161,9 @@ class _HangmanScreenState extends State<HangmanScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _game.isGameOver && !_game.isWinner
+          ? Colors.red.shade900
+          : Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -163,30 +185,32 @@ class _HangmanScreenState extends State<HangmanScreen>
                     spacing: 15,
                     children: [
                       Expanded(
-                        child: _game.isGameOver && !_game.isWinner
-                            ? HangmanLoseAnimation(
-                                animation: _loseController,
-                                gallows: CustomPaint(
-                                  size: const Size(200, 250),
-                                  painter: GallowsPainter(),
-                                ),
-                                stickman: _game.buildStickmanOnly(),
-                              )
-                            : _game.isGameOver && _game.isWinner
-                                ? HangmanWinAnimation(
-                                    animation: _winController,
-                                    child: _game.buildStickman(),
-                                  )
-                                : _game.buildStickman(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 60.0),
+                          child: _game.isGameOver && !_game.isWinner
+                              ? HangmanLoseAnimation(
+                                  animation: _loseController,
+                                  gallows: CustomPaint(
+                                    size: const Size(double.infinity, double.infinity),
+                                    painter: GallowsPainter(),
+                                  ),
+                                  stickman: _game.buildStickmanOnly(),
+                                )
+                              : _game.isGameOver && _game.isWinner
+                                  ? HangmanWinAnimation(
+                                      animation: _winController,
+                                      child: _game.buildStickman(),
+                                    )
+                                  : _game.buildStickman(),
+                        ),
                       ),
-
                       WordDisplay(
                           word: _game.word, guessed: _game.guessedLetters),
-
                       Card(
                         color: AppColors.card,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0, vertical: 5),
                           child: Text.rich(
                             TextSpan(
                               children: [
@@ -209,11 +233,11 @@ class _HangmanScreenState extends State<HangmanScreen>
                           ),
                         ),
                       ),
-
                       Card(
                         color: AppColors.card,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0, vertical: 5),
                           child: Text.rich(
                             TextSpan(
                               children: [
@@ -224,14 +248,16 @@ class _HangmanScreenState extends State<HangmanScreen>
                                   ),
                                 ),
                                 TextSpan(
-                                  text: '${_game.incorrectGuesses} / ${_game.maxGuesses}',
+                                  text:
+                                      '${_game.incorrectGuesses} / ${_game.maxGuesses}',
                                   style: AppTextStyles.headingMedium.copyWith(
                                     color: AppColors.red,
                                   ),
                                 ),
                               ],
                             ),
-                            textAlign: TextAlign.center, // aligns the whole text
+                            textAlign:
+                                TextAlign.center, // aligns the whole text
                             softWrap: true,
                           ),
                         ),

@@ -33,7 +33,7 @@ class AppTextStyles {
   );
 
   static const bodySmall = TextStyle(
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: FontWeight.normal,
     color: AppColors.textPrimary,
   );

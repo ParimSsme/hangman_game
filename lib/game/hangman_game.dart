@@ -43,17 +43,14 @@ class HangmanGame {
   int get maxGuesses => 6;
 
   Widget buildStickman() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 60.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            CustomPaint(size: const Size(double.infinity, double.infinity), painter: GallowsPainter()),
-            CustomPaint(size: const Size(double.infinity, double.infinity), painter: StickmanPainter(incorrectGuesses)),
-          ],
-        ),
+    return SizedBox(
+      width: double.infinity,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          CustomPaint(size: const Size(double.infinity, double.infinity), painter: GallowsPainter()),
+          CustomPaint(size: const Size(double.infinity, double.infinity), painter: StickmanPainter(incorrectGuesses)),
+        ],
       ),
     );
   }
