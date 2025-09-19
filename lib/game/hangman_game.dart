@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hangman/game/word_list.dart';
 import 'hangman_painter.dart';
 
 class HangmanGame {
@@ -13,15 +14,9 @@ class HangmanGame {
   }
 
   void reset() {
-    final words = [
-      {"word": "flutter", "hint": "A UI framework by Google"},
-      {"word": "widget", "hint": "The building block of Flutter UI"},
-      {"word": "state", "hint": "Something widgets can manage"},
-      {"word": "dart", "hint": "Programming language for Flutter"},
-    ];
 
-    words.shuffle();
-    final chosen = words.first;
+    wordList.shuffle();
+    final chosen = wordList.first;
 
     word = chosen["word"]!;
     hint = chosen["hint"]!;
@@ -48,15 +43,17 @@ class HangmanGame {
   int get maxGuesses => 6;
 
   Widget buildStickman() {
-    return SizedBox(
-      width: 200,
-      height: 250,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          CustomPaint(size: const Size(200, 250), painter: GallowsPainter()),
-          CustomPaint(size: const Size(200, 250), painter: StickmanPainter(incorrectGuesses)),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 60.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            CustomPaint(size: const Size(double.infinity, double.infinity), painter: GallowsPainter()),
+            CustomPaint(size: const Size(double.infinity, double.infinity), painter: StickmanPainter(incorrectGuesses)),
+          ],
+        ),
       ),
     );
   }

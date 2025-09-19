@@ -13,20 +13,28 @@ class Keyboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      alignment: WrapAlignment.center,
-      children: letters.split("").map((letter) {
-        final isDisabled = disabled.contains(letter.toLowerCase());
-        return ElevatedButton(
-          onPressed: isDisabled ? null : () => onTap(letter.toLowerCase()),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isDisabled ? Colors.grey : Colors.blue,
-          ),
-          child: Text(letter),
-        );
-      }).toList(),
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: Wrap(
+        spacing: 3,
+        runSpacing: 4,
+        alignment: WrapAlignment.center,
+        children: letters.split("").map((letter) {
+          final isDisabled = disabled.contains(letter);
+          return TextButton(
+            onPressed: isDisabled ? null : () => onTap(letter),
+            style: TextButton.styleFrom(
+              minimumSize: const Size(50, 50),
+              padding: EdgeInsets.zero,
+            ),
+            child: Text(
+              letter,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

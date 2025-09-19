@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hangman/theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
 import 'hangman_game.dart';
 import '../animations/win/hangman_win_animation.dart';
 import '../animations/lose/hangman_lose_animation.dart';
@@ -18,14 +20,19 @@ class _HangmanScreenState extends State<HangmanScreen>
   late HangmanGame _game;
   late AnimationController _winController;
   late AnimationController _loseController;
-  bool showHint = false;
 
   @override
   void initState() {
     super.initState();
     _game = HangmanGame();
-    _winController = AnimationController(vsync: this, duration: const Duration(seconds: 3));
-    _loseController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _winController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+    _loseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
   }
 
   void _onLetterTap(String letter) {
@@ -35,9 +42,16 @@ class _HangmanScreenState extends State<HangmanScreen>
       if (_game.isGameOver) {
         if (_game.isWinner) {
           _winController.forward(from: 0);
+
+          Future.delayed(const Duration(seconds: 1), () {
+            if (!mounted) return;
+            _showWinDialog();
+          });
         } else {
           _loseController.forward(from: 0);
+
           Future.delayed(const Duration(milliseconds: 600), () {
+            if (!mounted) return;
             _showGameOverDialog();
           });
         }
@@ -81,96 +95,156 @@ class _HangmanScreenState extends State<HangmanScreen>
     );
   }
 
+  void _showWinDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.black87,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: const Text(
+            "🎉 You Win!",
+            style: TextStyle(color: Colors.greenAccent),
+          ),
+          content: Text(
+            "Great job! The word was: ${_game.word.toUpperCase()}",
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _resetGame();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text("Play Again"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _resetGame() {
     setState(() {
       _game.reset();
       _winController.reset();
       _loseController.reset();
-      showHint = false;
     });
-  }
-
-  void _revealHint() {
-    if (!_game.usedHint) {
-      setState(() {
-        showHint = true;
-        _game.usedHint = true;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Hangman")),
-      body: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        curve: Curves.easeInOut,
-        color: _game.isGameOver && !_game.isWinner
-            ? Colors.red.shade900
-            : Colors.black,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: AnimatedContainer(
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+            color: _game.isGameOver && !_game.isWinner
+                ? Colors.red.shade900
+                : Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 30,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 15,
+                    children: [
+                      Expanded(
+                        child: _game.isGameOver && !_game.isWinner
+                            ? HangmanLoseAnimation(
+                                animation: _loseController,
+                                gallows: CustomPaint(
+                                  size: const Size(200, 250),
+                                  painter: GallowsPainter(),
+                                ),
+                                stickman: _game.buildStickmanOnly(),
+                              )
+                            : _game.isGameOver && _game.isWinner
+                                ? HangmanWinAnimation(
+                                    animation: _winController,
+                                    child: _game.buildStickman(),
+                                  )
+                                : _game.buildStickman(),
+                      ),
 
-                    _game.isGameOver && !_game.isWinner
-                        ? HangmanLoseAnimation(
-                      animation: _loseController,
-                      gallows: CustomPaint(size: const Size(200, 250), painter: GallowsPainter()),
-                      stickman: _game.buildStickmanOnly(),
-                    )
-                        : _game.isGameOver && _game.isWinner
-                        ? HangmanWinAnimation(animation: _winController, child: _game.buildStickman())
-                        : _game.buildStickman(),
+                      WordDisplay(
+                          word: _game.word, guessed: _game.guessedLetters),
 
-                    const SizedBox(height: 16),
+                      Card(
+                        color: AppColors.card,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Hint: ",
+                                  style: AppTextStyles.headingMedium.copyWith(
+                                    color: AppColors.blue,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: _game.hint,
+                                  style: AppTextStyles.headlineSmall.copyWith(
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                          ),
+                        ),
+                      ),
 
-                    Text(
-                      "Incorrect guesses: ${_game.incorrectGuesses} / ${_game.maxGuesses}",
-                      style: const TextStyle(fontSize: 18, color: Colors.redAccent),
-                    ),
-                  ],
+                      Card(
+                        color: AppColors.card,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Incorrect guesses: ",
+                                  style: AppTextStyles.headingMedium.copyWith(
+                                    color: AppColors.blue,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '${_game.incorrectGuesses} / ${_game.maxGuesses}',
+                                  style: AppTextStyles.headingMedium.copyWith(
+                                    color: AppColors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center, // aligns the whole text
+                            softWrap: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                Keyboard(onTap: _onLetterTap, disabled: _game.guessedLetters),
+              ],
             ),
-
-            WordDisplay(word: _game.word, guessed: _game.guessedLetters),
-
-            if (showHint)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "💡 Hint: ${_game.hint}",
-                  style: const TextStyle(fontSize: 18, color: Colors.yellow),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-
-            if (!_game.isGameOver && !_game.usedHint)
-              ElevatedButton(
-                onPressed: _revealHint,
-                child: const Text("Show Hint"),
-              ),
-
-            Keyboard(onTap: _onLetterTap, disabled: _game.guessedLetters),
-
-            if (_game.isGameOver)
-              ElevatedButton(
-                onPressed: _resetGame,
-                child: const Text("Play Again"),
-              ),
-          ],
+          ),
         ),
       ),
     );
   }
-
-
 }
-

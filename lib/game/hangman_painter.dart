@@ -6,22 +6,30 @@ class GallowsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.black
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 
     final baseY = size.height - 20;
 
-    // Gallows
+    // Base
     canvas.drawLine(Offset(20, baseY), Offset(size.width - 20, baseY), paint);
-    canvas.drawLine(Offset(50, baseY), Offset(50, 20), paint);
-    canvas.drawLine(Offset(50, 20), Offset(size.width / 2, 20), paint);
-    canvas.drawLine(Offset(size.width / 2, 20), Offset(size.width / 2, 50), paint);
+
+    // Vertical post
+    canvas.drawLine(Offset(50, baseY), const Offset(50, 20), paint);
+
+    // Top horizontal beam (make it longer, ~80% of canvas width)
+    final topBeamEndX = size.width * 0.8;
+    canvas.drawLine(const Offset(50, 20), Offset(topBeamEndX, 20), paint);
+
+    // Short hanging beam
+    canvas.drawLine(Offset(topBeamEndX, 20), Offset(topBeamEndX, 50), paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
 
 class StickmanPainter extends CustomPainter {
   final int stage;
@@ -30,20 +38,42 @@ class StickmanPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.black
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 
-    final headCenter = Offset(size.width / 2, 70);
+    // 👇 Hang stickman from beam end (aligned with GallowsPainter)
+    final hangX = size.width * 0.8;
+    final headCenter = Offset(hangX, 70);
 
-    if (stage > 0) canvas.drawCircle(headCenter, 20, paint); // Head
-    if (stage > 1) canvas.drawLine(Offset(size.width / 2, 90), Offset(size.width / 2, 150), paint); // Body
-    if (stage > 2) canvas.drawLine(Offset(size.width / 2, 100), Offset(size.width / 2 - 40, 120), paint); // Left arm
-    if (stage > 3) canvas.drawLine(Offset(size.width / 2, 100), Offset(size.width / 2 + 40, 120), paint); // Right arm
-    if (stage > 4) canvas.drawLine(Offset(size.width / 2, 150), Offset(size.width / 2 - 30, 200), paint); // Left leg
-    if (stage > 5) canvas.drawLine(Offset(size.width / 2, 150), Offset(size.width / 2 + 30, 200), paint); // Right leg
+    // Draw parts step by step
+    if (stage > 0) {
+      // Head
+      canvas.drawCircle(headCenter, 20, paint);
+    }
+    if (stage > 1) {
+      // Body
+      canvas.drawLine(Offset(hangX, 90), Offset(hangX, 150), paint);
+    }
+    if (stage > 2) {
+      // Left arm
+      canvas.drawLine(Offset(hangX, 100), Offset(hangX - 40, 120), paint);
+    }
+    if (stage > 3) {
+      // Right arm
+      canvas.drawLine(Offset(hangX, 100), Offset(hangX + 40, 120), paint);
+    }
+    if (stage > 4) {
+      // Left leg
+      canvas.drawLine(Offset(hangX, 150), Offset(hangX - 30, 200), paint);
+    }
+    if (stage > 5) {
+      // Right leg
+      canvas.drawLine(Offset(hangX, 150), Offset(hangX + 30, 200), paint);
+    }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
