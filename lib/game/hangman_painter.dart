@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 class GallowsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -12,17 +10,13 @@ class GallowsPainter extends CustomPainter {
 
     final baseY = size.height - 20;
 
-    // Base
     canvas.drawLine(Offset(20, baseY), Offset(size.width - 20, baseY), paint);
 
-    // Vertical post
     canvas.drawLine(Offset(50, baseY), const Offset(50, 20), paint);
 
-    // Top horizontal beam (make it longer, ~80% of canvas width)
     final topBeamEndX = size.width * 0.8;
     canvas.drawLine(const Offset(50, 20), Offset(topBeamEndX, 20), paint);
 
-    // Short hanging beam
     canvas.drawLine(Offset(topBeamEndX, 20), Offset(topBeamEndX, 50), paint);
   }
 
@@ -42,33 +36,32 @@ class StickmanPainter extends CustomPainter {
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 
-    // 👇 Hang stickman from beam end (aligned with GallowsPainter)
     final hangX = size.width * 0.8;
     final headCenter = Offset(hangX, 70);
 
-    // Draw parts step by step
+    /// Draw parts step by step
     if (stage > 0) {
-      // Head
+      /// Head
       canvas.drawCircle(headCenter, 20, paint);
     }
     if (stage > 1) {
-      // Body
+      /// Body
       canvas.drawLine(Offset(hangX, 90), Offset(hangX, 150), paint);
     }
     if (stage > 2) {
-      // Left arm
+      /// Left arm
       canvas.drawLine(Offset(hangX, 100), Offset(hangX - 40, 120), paint);
     }
     if (stage > 3) {
-      // Right arm
+      /// Right arm
       canvas.drawLine(Offset(hangX, 100), Offset(hangX + 40, 120), paint);
     }
     if (stage > 4) {
-      // Left leg
+      /// Left leg
       canvas.drawLine(Offset(hangX, 150), Offset(hangX - 30, 200), paint);
     }
     if (stage > 5) {
-      // Right leg
+      /// Right leg
       canvas.drawLine(Offset(hangX, 150), Offset(hangX + 30, 200), paint);
     }
   }
