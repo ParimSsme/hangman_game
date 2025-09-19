@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'game/hangman_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const HangmanApp());
@@ -11,11 +12,10 @@ class HangmanApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hangman',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        primaryColor: Colors.green,
-      ),
+      title: 'Hangman Game',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      themeMode: ThemeMode.light,
       home: const HangmanScreen(),
     );
   }
